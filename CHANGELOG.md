@@ -11,17 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for ESLint v10 (the config now supports `eslint@^9.38.0 || ^10.0.0`)
 
+### Fixed
+
+- Plugins, resolvers and the TypeScript parser are no longer referenced by name but imported directly. Names were resolved relative to the consuming project's working directory, so linting failed with "ESLint couldn't find the plugin", "invalid interface loaded as resolver" or "Cannot find module '@typescript-eslint/parser'" whenever a package manager did not hoist our dependencies into the consumer's root `node_modules` (pnpm without hoisting, yarn pnp). This affected every preset, including ones that do not use Next.js
+
 ### Changed
 
 - Updated all packages, notably `eslint-plugin-unicorn` (v65), `eslint-plugin-jsdoc` (v63), `eslint-plugin-cypress` (v6), `eslint-plugin-react-hooks` (v7.1) and `@eslint/compat` (v2)
 - Replaced `eslint-plugin-import` with its maintained fork `eslint-plugin-import-x`, which supports ESLint v10. The plugin is registered under the `import` name, so all rule ids stay `import/*` and existing `eslint-disable` comments and rule overrides keep working
-- The import plugin settings moved from the `import/*` to the `import-x/*` namespace (`import-x/resolver`, `import-x/parsers`, `import-x/ignore`). Projects that override these settings themselves have to rename them
+- The import plugin settings moved from the `import/*` to the `import-x/*` namespace (`import-x/resolver-next`, `import-x/parsers`, `import-x/ignore`). Projects that override these settings themselves have to rename them, the resolvers additionally moved from `import/resolver` to `import-x/resolver-next`
 - `@eslint/js` and `globals` are now regular dependencies instead of dev/transitive dependencies, both are imported at runtime
 - `eslint-plugin-react` is patched with `fixupPluginRules` instead of applying `fixupConfigRules` to the whole config, because the latter breaks the other (already ESLint v10 compatible) plugins
 
 ### Removed
 
 - Support for node < 22.13, required by `eslint-plugin-jsdoc`
+- The deprecated `config()` helper from `typescript-eslint`, the configs are plain arrays now. The resolved config is unchanged, the exported types stay the same
+- The `@eslint/eslintrc` dependency, it is no longer needed now that no config is loaded through `FlatCompat`
 
 ## [2.5.0] - 2026-06-10
 
